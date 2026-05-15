@@ -1,0 +1,25 @@
+Date,Category,Product,Revenue,Units Sold,Profit
+2025-01-15,Electronics,Laptop Pro X,125000,45,37500
+2025-01-22,Electronics,Wireless Earbuds,18500,230,9250
+2025-02-03,Software,Cloud Suite,89000,120,62300
+2025-02-14,Electronics,Smart Watch V3,34500,175,13800
+2025-03-01,Software,Analytics Pro,67000,85,46900
+2025-03-18,Hardware,Server Rack A1,245000,12,73500
+2025-04-05,Electronics,Tablet Ultra,52000,95,20800
+2025-04-20,Software,Security Shield,41000,200,32800
+2025-05-02,Hardware,Network Switch,28000,150,14000
+2025-05-15,Electronics,Camera Module,15600,310,7800
+2025-06-01,Software,CRM Platform,98000,60,68600
+2025-06-18,Hardware,GPU Cluster,310000,8,93000
+2025-07-04,Electronics,Bluetooth Speaker,12000,420,6000
+2025-07-22,Software,DevOps Toolkit,55000,110,38500
+2025-08-10,Hardware,Edge Compute Node,78000,35,31200
+2025-08-25,Electronics,VR Headset,42000,65,16800
+2025-09-08,Software,AI Assistant,135000,45,94500
+2025-09-20,Hardware,IoT Gateway,19500,280,9750
+2025-10-05,Electronics,Drone Controller,27500,125,11000
+2025-10-18,Software,Data Pipeline,73000,75,51100
+2025-11-02,Hardware,Sensor Array,8900,500,4450
+2025-11-15,Electronics,Smart Display,31000,140,12400
+2025-12-01,Software,ML Platform,165000,30,115500
+2025-12-20,Hardware,Robotics Kit,52000,55,20800

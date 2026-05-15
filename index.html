@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Yantrixa Analytics — Premium business intelligence dashboard. Upload CSV or PDF data and explore interactive charts, KPIs, and real-time filters.">
+    <meta name="author" content="Yantrixa">
+    <meta name="theme-color" content="#050508">
+
+    <meta property="og:title" content="Yantrixa Analytics — Business Intelligence Dashboard">
+    <meta property="og:description" content="Upload CSV or PDF data and explore interactive charts, KPIs, and exports.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="assets/logo.jpg">
+
+    <title>Yantrixa Analytics — Business Intelligence Dashboard</title>
+
+    <link rel="icon" href="assets/logo.jpg" type="image/jpeg">
+    <link rel="shortcut icon" href="assets/logo.jpg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="assets/logo.jpg">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <p class="loading-text">Processing your data...</p>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="csv-file-input" accept=".csv,.pdf">
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle menu">☰</button>
+
+    <div class="app-layout">
+
+        <!-- ============= SIDEBAR ============= -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/logo.jpg" alt="Yantrixa" class="sidebar-logo">
+                <div class="sidebar-brand">
+                    <span class="sidebar-brand-name">YANTRIXA</span>
+                    <span class="sidebar-brand-sub">Analytics</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a class="sidebar-link active" href="#" onclick="return false;">
+                    <span class="sidebar-link-icon">📊</span> Dashboard
+                </a>
+                <a class="sidebar-link" href="#chart-section" onclick="scrollToSection('chart-section')">
+                    <span class="sidebar-link-icon">📈</span> Charts
+                </a>
+                <a class="sidebar-link" href="#table-section" onclick="scrollToSection('table-section')">
+                    <span class="sidebar-link-icon">🗃️</span> Data Table
+                </a>
+                <a class="sidebar-link" href="#export-section" onclick="scrollToSection('export-section')">
+                    <span class="sidebar-link-icon">📤</span> Export
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>© 2026 Yantrixa</p>
+                <p>Engineering Intelligence</p>
+            </div>
+        </aside>
+
+        <!-- ============= MAIN CONTENT ============= -->
+        <main class="main-content">
+
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1>Analytics Dashboard</h1>
+                    <p>Upload CSV or PDF data to explore insights</p>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" id="btn-upload">
+                        <span>📁</span> Upload File
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content-area">
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <h2>Welcome to Yantrixa Analytics</h2>
+                    <p>Upload a CSV or PDF file to instantly generate KPIs, interactive charts, and exportable reports.</p>
+                    <div class="drop-zone" id="drop-zone">
+                        <span class="drop-icon">📂</span>
+                        <span class="drop-label">Drop your CSV or PDF here</span>
+                        <p class="drop-hint">or click to browse files (.csv, .pdf)</p>
+                    </div>
+                </div>
+
+                <!-- Dashboard Content (hidden until data loads) -->
+                <div class="dashboard-content hidden" id="dashboard-content">
+
+                    <!-- Filter Bar -->
+                    <div class="filter-bar animate-in">
+                        <label>Metric:</label>
+                        <select class="filter-select" id="filter-column"></select>
+
+                        <div class="filter-divider"></div>
+
+                        <label>Category:</label>
+                        <select class="filter-select" id="filter-category-col"></select>
+
+                        <div class="filter-divider" id="date-filter-divider"></div>
+
+                        <div id="date-filter-group" style="display: flex; align-items: center; gap: 8px;">
+                            <label>From:</label>
+                            <input type="date" class="filter-input" id="filter-date-from">
+                            <label>To:</label>
+                            <input type="date" class="filter-input" id="filter-date-to">
+                        </div>
+
+                        <div class="filter-divider"></div>
+
+                        <input type="text" class="filter-input filter-search" id="filter-search" placeholder="🔍  Search all columns...">
+
+                        <button class="btn-clear-filters" id="btn-clear-filters">✕ Clear</button>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card animate-in delay-1">
+                            <div class="kpi-header">
+                                <div class="kpi-icon">Σ</div>
+                                <span class="kpi-label">Total</span>
+                            </div>
+                            <div class="kpi-value" id="kpi-total">—</div>
+                            <div class="kpi-sub" id="kpi-total-sub">Upload data to view</div>
+                        </div>
+                        <div class="kpi-card animate-in delay-2">
+                            <div class="kpi-header">
+                                <div class="kpi-icon green">μ</div>
+                                <span class="kpi-label">Average</span>
+                            </div>
+                            <div class="kpi-value" id="kpi-avg">—</div>
+                            <div class="kpi-sub" id="kpi-avg-sub">Upload data to view</div>
+                        </div>
+                        <div class="kpi-card animate-in delay-3">
+                            <div class="kpi-header">
+                                <div class="kpi-icon orange">↑</div>
+                                <span class="kpi-label">Maximum</span>
+                            </div>
+                            <div class="kpi-value" id="kpi-max">—</div>
+                            <div class="kpi-sub" id="kpi-max-sub">Upload data to view</div>
+                        </div>
+                        <div class="kpi-card animate-in delay-4">
+                            <div class="kpi-header">
+                                <div class="kpi-icon purple">↓</div>
+                                <span class="kpi-label">Minimum</span>
+                            </div>
+                            <div class="kpi-value" id="kpi-min">—</div>
+                            <div class="kpi-sub" id="kpi-min-sub">Upload data to view</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="chart-grid" id="chart-section">
+                        <div class="chart-card animate-in delay-1">
+                            <div class="chart-header">
+                                <span class="chart-title">📊 Category Comparison</span>
+                                <button class="btn-icon" id="btn-export-bar" title="Download as PNG">📥</button>
+                            </div>
+                            <div class="chart-canvas-wrap">
+                                <canvas id="chart-bar"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card animate-in delay-2">
+                            <div class="chart-header">
+                                <span class="chart-title">📈 Trend Analysis</span>
+                                <button class="btn-icon" id="btn-export-line" title="Download as PNG">📥</button>
+                            </div>
+                            <div class="chart-canvas-wrap">
+                                <canvas id="chart-line"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card animate-in delay-3">
+                            <div class="chart-header">
+                                <span class="chart-title">🍩 Distribution</span>
+                                <button class="btn-icon" id="btn-export-pie" title="Download as PNG">📥</button>
+                            </div>
+                            <div class="chart-canvas-wrap">
+                                <canvas id="chart-pie"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Table -->
+                    <div class="table-section animate-in" id="table-section">
+                        <div class="table-header">
+                            <span class="table-title">🗃️ Filtered Data</span>
+                            <span class="table-info" id="table-info">0 rows</span>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="data-table">
+                                <thead id="table-head"></thead>
+                                <tbody id="table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Export Bar -->
+                    <div class="export-bar animate-in" id="export-section">
+                        <span class="export-bar-title">📤 EXPORT OPTIONS</span>
+                        <button class="btn btn-secondary" id="btn-export-csv">
+                            <span>💾</span> Download CSV
+                        </button>
+                        <button class="btn btn-secondary" id="btn-export-pdf">
+                            <span>📄</span> Download PDF
+                        </button>
+                        <button class="btn btn-secondary" id="btn-copy-clipboard">
+                            <span>📋</span> Copy to Clipboard
+                        </button>
+                        <button class="btn btn-clear-dashboard" id="btn-clear-dashboard">
+                            <span>🗑️</span> Clear Dashboard
+                        </button>
+                    </div>
+
+                </div><!-- /dashboard-content -->
+
+            </div><!-- /content-area -->
+        </main>
+
+    </div><!-- /app-layout -->
+
+    <script src="app.js"></script>
+    <script>
+        // Sidebar smooth scroll helper
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            // Update active link
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            // Close mobile sidebar
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>
